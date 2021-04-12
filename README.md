@@ -39,3 +39,5 @@ CREATE USER 'weather_user'@'localhost' identified by 'weather_password';
 GRANT ALL on weather.* to 'weather_user'@'localhost';
 quit
 ```
+Let's run the migrations `php migration.php` or `http://<domainname>/migration.php`
+

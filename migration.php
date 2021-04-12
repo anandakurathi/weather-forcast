@@ -2,7 +2,7 @@
 require 'bootstrap.php';
 
 $statement = <<<EOS
-    CREATE TABLE routee_token (
+    CREATE TABLE routee_tokens (
       id int(11) unsigned NOT NULL AUTO_INCREMENT,
       token varchar(200) NOT NULL,
       expiry datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
