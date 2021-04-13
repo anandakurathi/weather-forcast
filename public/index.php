@@ -1,11 +1,11 @@
 <?php
 
 require "../bootstrap.php";
-use Src\Controller\WeatherNotifierController;
+use Src\Controllers\WeatherNotifierController;
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
+header("Access-Control-Allow-Methods: GET");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
@@ -14,7 +14,7 @@ $uri = explode( '/', $uri );
 
 // all of our endpoints start with /person
 // everything else results in a 404 Not Found
-if ($uri[1] !== 'person') {
+if ($uri[1] !== 'forcast') {
     header("HTTP/1.1 404 Not Found");
     exit();
 }
