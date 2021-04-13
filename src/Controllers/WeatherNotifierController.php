@@ -2,6 +2,7 @@
 
 namespace Src\Controllers;
 
+use Src\Model\Job;
 use Src\Services\OpenWeatherService;
 use Src\Services\RouteeService;
 
@@ -9,7 +10,7 @@ use Src\Services\RouteeService;
  * Class WeatherNotifierController
  * @package Src\Controllers
  */
-class WeatherNotifierController
+class WeatherNotifierController extends BaseController
 {
     /**
      * @var RouteeService
@@ -28,6 +29,11 @@ class WeatherNotifierController
      */
     private $openWeather;
 
+    /**
+     * @var Job
+     */
+    private $jobs;
+
     public function __construct(
         $db,
         $requestMethod
@@ -36,33 +42,20 @@ class WeatherNotifierController
         $this->db = $db;
         $this->requestMethod = $requestMethod;
         $this->openWeather = new OpenWeatherService;
-    }
-
-    /**
-     * Process the http request based on the request method for now supporting GET
-     */
-    public function processRequest()
-    {
-        switch ($this->requestMethod) {
-            case 'GET':
-                $response = $this->forecast();
-                break;
-            default:
-                $response = $this->notFoundResponse();
-                break;
-        }
-        header($response['status_code_header']);
-        if ($response['body']) {
-            echo $response['body'];
-        }
+        $this->jobs = new Job($db);
     }
 
     /**
      * Forecast the weather information to user
      * @return array
      */
-    private function forecast()
+    public function index()
     {
+        $jobs = $this->jobs->getJob();
+        if (!$jobs) {
+            return $this->notFoundResponse();
+        }
+
         // make a call to open weather and get temperature
         $temperature = $this->openWeather->getCurrentWeather();
         if (!$temperature) {
@@ -74,46 +67,26 @@ class WeatherNotifierController
         if (!$authToken) {
             return $this->unprocessableEntityResponse();
         }
-
-        // prepare SMS message and call Routee
-        $message = $this->smsMessage($temperature);
-        $payload = json_encode([
-            'body' => $message,
-            'to' => getenv('REPORTING_MOBILE_NUMBER'),
-            'from' => 'amdTelecom'
-        ]);
-        $smsDetails = $this->routee->sendSms($authToken, $payload);
-        if (!$smsDetails) {
-            return $this->unprocessableEntityResponse();
+        $executedJobs = [];
+        foreach ($jobs as $job) {
+            // prepare SMS message and call Routee
+            $message = $this->smsMessage($temperature);
+            $payload = json_encode([
+                'body' => $message,
+                'to' => getenv('REPORTING_MOBILE_NUMBER'),
+                'from' => 'amdTelecom'
+            ]);
+            $smsDetails = $this->routee->sendSms($authToken, $payload);
+            if (!$smsDetails) {
+                $this->jobs->updateJobById($job->id, $this->jobs::STATUS['ERROR']);
+            }
+            $this->jobs->updateJobById($job->id, $this->jobs::STATUS['DONE']);
+            $executedJobs[] = $smsDetails;
         }
 
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
-        $response['body'] = $smsDetails;
-        return $response;
-    }
-
-    /**
-     * unprocessable Entity Response
-     * @return array
-     */
-    private function unprocessableEntityResponse() : array
-    {
-        $response['status_code_header'] = 'HTTP/1.1 422 Unprocessable Entity';
-        $response['body'] = json_encode([
-            'error' => 'Unprocessable Entity'
-        ]);
-        return $response;
-    }
-
-    /**
-     * not Found Response
-     * @return array
-     */
-    private function notFoundResponse() : array
-    {
-        $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
-        $response['body'] = null;
-        return $response;
+        $response['body'] = json_encode($executedJobs);
+        return $this->response($response);
     }
 
     /**

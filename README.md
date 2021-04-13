@@ -39,5 +39,12 @@ CREATE USER 'weather_user'@'localhost' identified by 'weather_password';
 GRANT ALL on weather.* to 'weather_user'@'localhost';
 quit
 ```
-Let's run the migrations `php migration.php` or `http://<domainname>/migration.php`
 
+Let's run the migrations `php migration.php`
+
+start the application by using
+`php -S 127.0.0.1:8000 -t public`
+
+Our API endpoint is `http://127.0.0.1:8000/forcast`
+
+to repeat the process every 10 minutes 

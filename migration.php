@@ -13,7 +13,6 @@ $statement = <<<EOS
 
     CREATE TABLE jobs (
       id int(11) unsigned NOT NULL AUTO_INCREMENT,
-      payload text,
       status enum('NEW','PROCESSING','DONE','ERROR') DEFAULT NULL,
       whento datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
       created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,

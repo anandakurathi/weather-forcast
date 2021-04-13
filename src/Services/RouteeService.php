@@ -66,6 +66,7 @@ class RouteeService
 
         $response = $this->curl->makeRequest($url, 'POST', $headers, $payload);
         if ($response && (isset($response['error']) || isset($response['code']))) {
+
             return null;
         }
         return $response;
