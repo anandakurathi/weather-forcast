@@ -8,6 +8,7 @@ Repeat the above procedure every 10 minutes for 10 times and then stop.
 
 ### The tech stack using
 PHP 7.2
+
 MySQL 5.6
 
 
@@ -45,7 +46,7 @@ Let's run the migrations `php migration.php`
 start the application by using
 `php -S 127.0.0.1:8000 -t public`
 
-To repeat the process every 10 minutes for 10 times needed a cron as we are not using any queueing engine.
+To repeat the process every 10 minutes for 10 times needed a cron. As we are not using any queueing engine.
 
 To initiate the monitoring of weather call this API `GET http://127.0.0.1:8000/forcast/initiate`
 
