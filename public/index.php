@@ -11,17 +11,29 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 $routeList = [
-    'forecast/initiate' => '\Src\Controllers\ForecastInitiateController#index',
-    'forecast' => '\Src\Controllers\WeatherNotifierController#index'
+    'forecast/initiate' => '\Src\Controllers\ForecastInitiateController#index#GET',
+    'forecast' => '\Src\Controllers\WeatherNotifierController#index#GET'
 ];
+
 $requestUri = trim($_SERVER['REQUEST_URI'], '/');
+if (!$requestUri) {
+    echo "Welcome to Weather check";
+    die();
+}
+
 $route = matchRoute($requestUri, $routeList);
-list($className, $action) = explode('#', $route);
+if(!$route) {
+    halt();
+}
+
+list($className, $action, $method) = explode('#', $route);
+if(strtoupper($method) !== $requestMethod) {
+    halt();
+}
 
 if (is_callable(array($className, $action))) {
     $controller = new $className($dbConnection, $requestMethod);
     $controller->$action();
 } else {
-    header("HTTP/1.1 404 Not Found");
-    exit();
+    halt();
 }

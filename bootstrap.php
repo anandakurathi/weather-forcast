@@ -14,3 +14,9 @@ function matchRoute($route, $routeList)
 {
     return (array_key_exists($route, $routeList)) ? $routeList[$route] : null;
 }
+
+function halt()
+{
+    header("HTTP/1.1 404 Not Found");
+    exit();
+}

@@ -45,13 +45,15 @@ Let's run the migrations `php migration.php`
 start the application by using
 `php -S 127.0.0.1:8000 -t public`
 
-Our API endpoint is `http://127.0.0.1:8000/forcast`
-
 To repeat the process every 10 minutes for 10 times needed a cron as we are not using any queueing engine.
+
+To initiate the monitoring of weather call this API `GET http://127.0.0.1:8000/forcast/initiate`
+
+To execute the job use this endpoint `http://127.0.0.1:8000/forecast`
 
 if you use linux and add curl command
 ```
 crontab -e
 
-* * * * * /usr/bin/curl --silent http://127.0.0.1:8000/forecast/initiate &>/dev/null
+* * * * * /usr/bin/curl --silent http://127.0.0.1:8000/forecast &>/dev/null
 ```
