@@ -47,4 +47,11 @@ start the application by using
 
 Our API endpoint is `http://127.0.0.1:8000/forcast`
 
-to repeat the process every 10 minutes 
+To repeat the process every 10 minutes for 10 times needed a cron as we are not using any queueing engine.
+
+if you use linux and add curl command
+```
+crontab -e
+
+* * * * * /usr/bin/curl --silent http://127.0.0.1:8000/forecast/initiate &>/dev/null
+```
